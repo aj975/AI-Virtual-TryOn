@@ -1,42 +1,14 @@
 
-import cv2
-import mediapipe as mp
-import numpy as np
-import math
-
-print("AI VIRTUAL TRY-ON STARTED")
-
-cap = cv2.VideoCapture(0)
-
-if not cap.isOpened():
-    print("ERROR: Webcam not detected!")
-    exit()
-
-mp_pose = mp.solutions.pose
-mp_draw = mp.solutions.drawing_utils
-
-pose = mp_pose.Pose(
-    model_complexity=0,
-    min_detection_confidence=0.5,
-    min_tracking_confidence=0.5
-)
-
-shirt_options = {
-    1: ("BLUE T-SHIRT", (255, 100, 30)),
-    2: ("BLACK T-SHIRT", (40, 40, 40)),
-    3: ("RED T-SHIRT", (30, 30, 220))
-}
-
-selected = 1
-
-
-def draw_shirt(frame, landmarks, shirt_color):
+def apply_shirt(frame, landmarks):
 
     h, w = frame.shape[:2]
 
     def point(index):
         p = landmarks[index]
-        return (int(p.x * w), int(p.y * h))
+        return np.array(
+            [p.x * w, p.y * h],
+            dtype=np.float32
+        )
 
     # Body landmarks
     ls = point(11)
@@ -45,140 +17,98 @@ def draw_shirt(frame, landmarks, shirt_color):
     rh = point(24)
 
     # Check visibility
-    for index in [11, 12, 23, 24]:
-        if landmarks[index].visibility < 0.5:
+    for i in [11, 12, 23, 24]:
+        if landmarks[i].visibility < 0.5:
             return frame
 
-    shoulder_width = math.dist(ls, rs)
+    # Screen-left and screen-right
+    shoulders = sorted([ls, rs], key=lambda p: p[0])
+    hips = sorted([lh, rh], key=lambda p: p[0])
 
-    if shoulder_width < 30:
+    sl, sr = shoulders
+    hl, hr = hips
+
+    shoulder_width = np.linalg.norm(sr - sl)
+
+    if shoulder_width < 40:
         return frame
 
-    center_x = (ls[0] + rs[0]) // 2
-    top_y = (ls[1] + rs[1]) // 2
+    # Neck position
+    neck_center = (sl + sr) / 2
 
-    neck = int(shoulder_width * 0.13)
-    sleeve = int(shoulder_width * 0.32)
-
-    # T-shirt shape
-    shirt = np.array([
-        [center_x - neck, top_y + int(shoulder_width * 0.05)],
-        [ls[0] - int(shoulder_width * 0.08), ls[1]],
-        [ls[0] - sleeve, ls[1] + int(shoulder_width * 0.22)],
-        [ls[0] - int(shoulder_width * 0.15), ls[1] + int(shoulder_width * 0.38)],
-        [lh[0] - int(shoulder_width * 0.12), lh[1]],
-        [rh[0] + int(shoulder_width * 0.12), rh[1]],
-        [rs[0] + int(shoulder_width * 0.15), rs[1] + int(shoulder_width * 0.38)],
-        [rs[0] + sleeve, rs[1] + int(shoulder_width * 0.22)],
-        [rs[0] + int(shoulder_width * 0.08), rs[1]],
-        [center_x + neck, top_y + int(shoulder_width * 0.05)]
-    ], dtype=np.int32)
-
-    overlay = frame.copy()
-    mask = np.zeros((h, w), dtype=np.uint8)
-
-    cv2.fillPoly(overlay, [shirt], shirt_color)
-    cv2.fillPoly(mask, [shirt], 255)
-
-    # Neck opening
-    cv2.ellipse(
-        mask,
-        (center_x, top_y + int(shoulder_width * 0.07)),
-        (neck, int(shoulder_width * 0.09)),
-        0, 0, 360, 0, -1
+    # Torso dimensions
+    torso_height = np.linalg.norm(
+        ((hl + hr) / 2) - neck_center
     )
 
-    alpha = 0.65
+    if torso_height < 50:
+        return frame
 
-    blended = cv2.addWeighted(
-        frame, 1 - alpha,
-        overlay, alpha, 0
+    # Garment dimensions
+    shirt_width = shoulder_width * 1.35
+    shirt_height = torso_height * 1.15
+
+    # Destination points
+    top_left = (
+        neck_center[0] - shirt_width * 0.50,
+        neck_center[1] - shoulder_width * 0.12
     )
 
-    frame[mask > 0] = blended[mask > 0]
-
-    return frame
-
-
-print("Webcam connected!")
-print("Press 1, 2, 3 to change clothes.")
-print("Press Q to quit.")
-
-while True:
-
-    success, frame = cap.read()
-
-    if not success:
-        print("Cannot read webcam!")
-        break
-
-    frame = cv2.flip(frame, 1)
-
-    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    results = pose.process(rgb)
-
-    if results.pose_landmarks:
-
-        frame = draw_shirt(
-            frame,
-            results.pose_landmarks.landmark,
-            shirt_options[selected][1]
-        )
-
-        mp_draw.draw_landmarks(
-            frame,
-            results.pose_landmarks,
-            mp_pose.POSE_CONNECTIONS
-        )
-
-    cv2.putText(
-        frame,
-        "VIRTUAL TRY-ON",
-        (20, 40),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.8,
-        (0, 255, 0),
-        2
+    top_right = (
+        neck_center[0] + shirt_width * 0.50,
+        neck_center[1] - shoulder_width * 0.12
     )
 
-    cv2.putText(
-        frame,
-        "OUTFIT: " + shirt_options[selected][0],
-        (20, 75),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.65,
-        (255, 255, 255),
-        2
+    bottom_right = (
+        hr[0] + shoulder_width * 0.08,
+        neck_center[1] + shirt_height * 0.85
     )
 
-    cv2.putText(
-        frame,
-        "Press 1 / 2 / 3 to change outfit",
-        (20, 110),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.55,
-        (255, 255, 255),
-        2
+    bottom_left = (
+        hl[0] - shoulder_width * 0.08,
+        neck_center[1] + shirt_height * 0.85
     )
 
-    cv2.imshow("AI VIRTUAL TRY-ON", frame)
+    destination = np.array([
+        top_left,
+        top_right,
+        bottom_right,
+        bottom_left
+    ], dtype=np.float32)
 
-    key = cv2.waitKey(1) & 0xFF
+    sh, sw = alpha.shape
 
-    if key == ord('1'):
-        selected = 1
+    source = np.array([
+        [0, 0],
+        [sw - 1, 0],
+        [sw - 1, sh - 1],
+        [0, sh - 1]
+    ], dtype=np.float32)
 
-    elif key == ord('2'):
-        selected = 2
+    # Perspective transformation
+    matrix = cv2.getPerspectiveTransform(
+        source, destination
+    )
 
-    elif key == ord('3'):
-        selected = 3
+    warped_shirt = cv2.warpPerspective(
+        shirt_bgr, matrix, (w, h)
+    )
 
-    elif key == ord('q'):
-        break
+    warped_alpha = cv2.warpPerspective(
+        alpha, matrix, (w, h)
+    )
 
-cap.release()
-pose.close()
-cv2.destroyAllWindows()
+    # Smooth transparent blending
+    mask = warped_alpha.astype(
+        np.float32
+    ) / 255.0
 
-print("Virtual Try-On closed successfully!")
+    mask = mask[:, :, np.newaxis]
+
+    result = (
+        warped_shirt.astype(np.float32) * mask
+        +
+        frame.astype(np.float32) * (1 - mask)
+    )
+
+    return np.clip(result, 0, 255).astype(np.uint8)
