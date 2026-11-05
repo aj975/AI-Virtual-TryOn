@@ -1,0 +1,383 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+    --black: #111111;
+    --white: #ffffff;
+    --gray: #777777;
+    --light: #f5f5f3;
+    --accent: #c8ff4d;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--black);
+}
+
+button, a {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* NAVBAR */
+
+.navbar {
+    height: 88px;
+    padding: 0 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #eaeaea;
+    background: white;
+}
+
+.logo {
+    font-family: 'Outfit', sans-serif;
+    font-size: 27px;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+}
+
+.logo span {
+    color: #888;
+}
+
+.navbar nav {
+    display: flex;
+    gap: 36px;
+}
+
+.navbar nav a {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.navbar nav a:hover {
+    color: #777;
+}
+
+.nav-button,
+.primary-button {
+    display: inline-block;
+    background: var(--black);
+    color: white;
+    border: 1px solid var(--black);
+    padding: 16px 25px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    transition: 0.25s;
+}
+
+.nav-button:hover,
+.primary-button:hover {
+    background: var(--accent);
+    color: var(--black);
+}
+
+/* HERO */
+
+.hero {
+    min-height: 620px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--light);
+}
+
+.hero-content {
+    padding: 100px 12%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    margin-bottom: 24px;
+}
+
+.hero h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(48px, 5vw, 85px);
+    font-weight: 900;
+    letter-spacing: -4px;
+    line-height: 0.98;
+    margin-bottom: 30px;
+}
+
+.hero h1 span {
+    color: #888;
+}
+
+.hero-description {
+    max-width: 410px;
+    color: #666;
+    font-size: 15px;
+    line-height: 1.8;
+    margin-bottom: 35px;
+}
+
+.hero-visual {
+    background: #202020;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.hero-placeholder {
+    color: #bcbcbc;
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(20px, 3vw, 42px);
+    font-weight: 900;
+    letter-spacing: -1px;
+    text-align: center;
+    padding: 40px;
+}
+
+/* COLLECTION */
+
+.collection {
+    padding: 100px 7%;
+}
+
+.section-heading {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-heading h2,
+.about h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(35px, 4vw, 55px);
+    font-weight: 900;
+    letter-spacing: -2px;
+}
+
+.section-heading > p:last-child {
+    color: #777;
+    margin-top: 15px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.product-card {
+    background: white;
+}
+
+.product-image {
+    height: 380px;
+    background: #f1f1f1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 35px;
+    overflow: hidden;
+}
+
+.product-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.35s;
+}
+
+.product-card:hover img {
+    transform: scale(1.07);
+}
+
+.product-info {
+    padding: 22px 0;
+}
+
+.product-info h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 21px;
+    margin-bottom: 6px;
+}
+
+.product-info p {
+    color: #777;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+.product-info button {
+    width: 100%;
+    padding: 15px;
+    background: white;
+    color: black;
+    border: 1px solid black;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    transition: 0.25s;
+}
+
+.product-info button:hover {
+    background: black;
+    color: white;
+}
+
+/* ABOUT */
+
+.about {
+    padding: 110px 7%;
+    text-align: center;
+    background: #111;
+    color: white;
+}
+
+.about h2 {
+    margin-bottom: 25px;
+}
+
+.about > p:last-child {
+    max-width: 570px;
+    margin: auto;
+    color: #aaa;
+    line-height: 1.9;
+}
+
+/* TRY-ON MODAL */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: white;
+    padding: 40px;
+    position: relative;
+    text-align: center;
+}
+
+.modal-content h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+
+.modal-content > p {
+    color: #777;
+    margin-bottom: 25px;
+}
+
+.close-button {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    border: none;
+    background: none;
+    font-size: 32px;
+}
+
+.camera-placeholder {
+    height: 300px;
+    background: #eaeaea;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 25px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+/* FOOTER */
+
+footer {
+    padding: 35px;
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+}
+
+/* MOBILE */
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0 5%;
+        height: 75px;
+    }
+
+    .navbar nav {
+        display: none;
+    }
+
+    .logo {
+        font-size: 22px;
+    }
+
+    .nav-button {
+        padding: 12px;
+        font-size: 10px;
+    }
+
+    .hero {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-content {
+        padding: 75px 7%;
+    }
+
+    .hero h1 {
+        letter-spacing: -2px;
+    }
+
+    .hero-visual {
+        min-height: 300px;
+    }
+
+    .collection {
+        padding: 75px 7%;
+    }
+
+    .modal-content {
+        padding: 35px 20px;
+    }
+}
