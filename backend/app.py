@@ -14,7 +14,7 @@ BASE = Path(__file__).resolve().parent.parent
 OUTPUTS = BASE / "outputs"
 OUTPUTS.mkdir(exist_ok=True)
 
-GARMENT = BASE / "garments" / "blue_tshirt.webp"
+GARMENT = BASE / "garments" / "blue_tshirt_clean.png"
 
 
 @app.route("/api/health")
