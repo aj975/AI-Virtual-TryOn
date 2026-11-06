@@ -1,55 +1,82 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIRTUAL FIT | AI Fashion</title>
+    <title>VIRTUALFIT | AI Fashion</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="navbar">
     <a href="#" class="logo">VIRTUAL<span>FIT</span></a>
+
     <nav>
         <a href="#home">Home</a>
         <a href="#collection">Collection</a>
         <a href="#about">About</a>
     </nav>
-    <button class="nav-button" onclick="openTryOn()">TRY IT ON</button>
+
+    <button class="nav-button" onclick="openTryOn()">
+        TRY IT ON
+    </button>
 </header>
 
 <section class="hero" id="home">
     <div class="hero-content">
         <p class="eyebrow">THE FUTURE OF FASHION</p>
-        <h1>YOUR STYLE.<br>YOUR FIT.<br><span>YOUR REALITY.</span></h1>
+
+        <h1>
+            YOUR STYLE.<br>
+            YOUR FIT.<br>
+            <span>YOUR REALITY.</span>
+        </h1>
+
         <p class="hero-description">
             Discover fashion powered by artificial intelligence.
             Try on clothing virtually before you buy.
         </p>
-        <a href="#collection" class="primary-button">EXPLORE COLLECTION</a>
+
+        <a href="#collection" class="primary-button">
+            EXPLORE COLLECTION
+        </a>
     </div>
+
     <div class="hero-visual">
-        <div class="hero-placeholder">AI FASHION EXPERIENCE</div>
+        <div class="hero-placeholder">
+            AI FASHION EXPERIENCE
+        </div>
     </div>
 </section>
 
 <section class="collection" id="collection">
     <div class="section-heading">
         <p class="eyebrow">CURATED FOR YOU</p>
+
         <h2>THE COLLECTION</h2>
-        <p>Find your next look. Experience it virtually.</p>
+
+        <p>
+            Find your next look. Experience it virtually.
+        </p>
     </div>
 
     <div class="product-grid">
         <article class="product-card">
             <div class="product-image">
-                <img src="../garments/blue_tshirt_transparent.png"
-                     alt="Blue T-Shirt">
+                <img
+                    src="../garments/blue_tshirt_transparent.png"
+                    alt="Essential Blue T-Shirt"
+                >
             </div>
+
             <div class="product-info">
                 <h3>Essential Blue Tee</h3>
                 <p>Everyday Collection</p>
-                <button onclick="openTryOn()">TRY IT ON</button>
+
+                <button onclick="openTryOn()">
+                    TRY IT ON
+                </button>
             </div>
         </article>
     </div>
@@ -57,29 +84,56 @@
 
 <section class="about" id="about">
     <p class="eyebrow">SMARTER SHOPPING</p>
+
     <h2>SEE IT. TRY IT. LOVE IT.</h2>
+
     <p>
         Our AI-powered virtual fitting experience helps you
         visualise clothing on yourself before making a decision.
     </p>
 </section>
 
+<!-- AI VIRTUAL TRY-ON MODAL -->
+
 <div class="modal" id="tryOnModal">
     <div class="modal-content">
-        <button class="close-button" onclick="closeTryOn()">×</button>
+
+        <button
+            class="close-button"
+            onclick="closeTryOn()"
+            aria-label="Close virtual try-on"
+        >
+            &times;
+        </button>
+
         <h2>AI VIRTUAL TRY-ON</h2>
-        <p>Camera-based virtual try-on is coming next.</p>
+
+        <p class="tryon-description">
+            See yourself wearing the Essential Blue Tee
+            with AI-powered virtual try-on.
+        </p>
+
+        <p class="tryon-instructions">
+            Stand in front of your camera with your
+            upper body clearly visible.
+            Your photo will be captured automatically
+            after a 5-second countdown.
+        </p>
+
         <div class="camera-placeholder">
             <p>CAMERA PREVIEW</p>
         </div>
-        <button class="primary-button" onclick="closeTryOn()">
-            CLOSE PREVIEW
-        </button>
+
+        <!-- Camera controls and AI results
+             are inserted here by script.js -->
+
     </div>
 </div>
 
 <footer>
-    <p>© 2026 VIRTUAL FIT. AI-POWERED FASHION.</p>
+    <p>
+        &copy; 2026 VIRTUALFIT. AI-POWERED FASHION.
+    </p>
 </footer>
 
 <script src="script.js"></script>

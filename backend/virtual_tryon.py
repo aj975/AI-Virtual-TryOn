@@ -1,114 +1,64 @@
+@'
+from gradio_client import Client, handle_file
+from pathlib import Path
+import shutil
+import requests
 
-def apply_shirt(frame, landmarks):
+BASE_DIR = Path(__file__).resolve().parent.parent
+OUTPUT_DIR = BASE_DIR / "outputs"
+OUTPUT_DIR.mkdir(exist_ok=True)
 
-    h, w = frame.shape[:2]
+SPACE_ID = "fashn-ai/fashn-vton-1.5"
 
-    def point(index):
-        p = landmarks[index]
-        return np.array(
-            [p.x * w, p.y * h],
-            dtype=np.float32
-        )
+def virtual_tryon(person_image, garment_image):
+    print("Connecting to FASHN AI...", flush=True)
 
-    # Body landmarks
-    ls = point(11)
-    rs = point(12)
-    lh = point(23)
-    rh = point(24)
+    client = Client(SPACE_ID)
 
-    # Check visibility
-    for i in [11, 12, 23, 24]:
-        if landmarks[i].visibility < 0.5:
-            return frame
+    print("Generating AI try-on...", flush=True)
 
-    # Screen-left and screen-right
-    shoulders = sorted([ls, rs], key=lambda p: p[0])
-    hips = sorted([lh, rh], key=lambda p: p[0])
-
-    sl, sr = shoulders
-    hl, hr = hips
-
-    shoulder_width = np.linalg.norm(sr - sl)
-
-    if shoulder_width < 40:
-        return frame
-
-    # Neck position
-    neck_center = (sl + sr) / 2
-
-    # Torso dimensions
-    torso_height = np.linalg.norm(
-        ((hl + hr) / 2) - neck_center
+    result = client.predict(
+        person_image=handle_file(str(person_image)),
+        garment_image=handle_file(str(garment_image)),
+        category="tops",
+        garment_photo_type="flat-lay",
+        num_timesteps=50,
+        guidance_scale=1.5,
+        seed=42,
+        segmentation_free=True,
+        api_name="/tryon"
     )
 
-    if torso_height < 50:
-        return frame
+    if isinstance(result, dict):
+        result_path = result.get("path")
+        result_url = result.get("url")
+    else:
+        result_path = result
+        result_url = None
 
-    # Garment dimensions
-    shirt_width = shoulder_width * 1.35
-    shirt_height = torso_height * 1.15
+    output_path = OUTPUT_DIR / "tryon_result.png"
 
-    # Destination points
-    top_left = (
-        neck_center[0] - shirt_width * 0.50,
-        neck_center[1] - shoulder_width * 0.12
-    )
+    if result_path and Path(result_path).exists():
+        shutil.copy2(result_path, output_path)
+    elif result_url:
+        response = requests.get(result_url, timeout=60)
+        response.raise_for_status()
+        output_path.write_bytes(response.content)
+    else:
+        raise RuntimeError(f"Could not retrieve result: {result}")
 
-    top_right = (
-        neck_center[0] + shirt_width * 0.50,
-        neck_center[1] - shoulder_width * 0.12
-    )
+    print("SUCCESS! Result saved:", output_path, flush=True)
 
-    bottom_right = (
-        hr[0] + shoulder_width * 0.08,
-        neck_center[1] + shirt_height * 0.85
-    )
+if __name__ == "__main__":
+    person = BASE_DIR / "assets" / "person.jpeg"
+    garment = BASE_DIR / "garments" / "blue_tshirt_transparent.png"
 
-    bottom_left = (
-        hl[0] - shoulder_width * 0.08,
-        neck_center[1] + shirt_height * 0.85
-    )
+    print("Checking input images...", flush=True)
 
-    destination = np.array([
-        top_left,
-        top_right,
-        bottom_right,
-        bottom_left
-    ], dtype=np.float32)
-
-    sh, sw = alpha.shape
-
-    source = np.array([
-        [0, 0],
-        [sw - 1, 0],
-        [sw - 1, sh - 1],
-        [0, sh - 1]
-    ], dtype=np.float32)
-
-    # Perspective transformation
-    matrix = cv2.getPerspectiveTransform(
-        source, destination
-    )
-
-    warped_shirt = cv2.warpPerspective(
-        shirt_bgr, matrix, (w, h)
-    )
-
-    warped_alpha = cv2.warpPerspective(
-        alpha, matrix, (w, h)
-    )
-
-    # Smooth transparent blending
-    mask = warped_alpha.astype(
-        np.float32
-    ) / 255.0
-
-    mask = mask[:, :, np.newaxis]
-
-    result = (
-        warped_shirt.astype(np.float32) * mask
-        +
-        frame.astype(np.float32) * (1 - mask)
-    )
-
-    return np.clip(result, 0, 255).astype(np.uint8)
+    if not person.exists():
+        print("ERROR: assets/person.jpeg not found")
+    elif not garment.exists():
+        print("ERROR: Garment image not found")
+    else:
+        virtual_tryon(person, garment)
+'@ | Set-Content -Encoding UTF8 backend\fashn_client.py

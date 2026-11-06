@@ -7,3 +7,15 @@ models/
 .vscode/
 
 .env
+.env
+.venv/
+__pycache__/
+*.pyc
+
+# Personal photos and generated results
+assets/
+outputs/
+
+# Downloaded browser pages
+GitHub account created (2).html
+GitHub account created (2)_files/
